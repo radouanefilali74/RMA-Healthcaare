@@ -1,0 +1,6 @@
+{
+  "name": "GPS & Health Smartwatch Ecosystem Simulator",
+  "description": "Full-stack simulation of a GPS/Health Smartwatch ecosystem based on a custom TCP/IP string-based protocol with device UI, operator dashboard, and live packet sniffer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
