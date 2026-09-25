@@ -12,9 +12,12 @@
   "app": {
     "windows": [
       {
-        "title": "watch-simulator",
-        "width": 800,
-        "height": 600
+        "title": "Watch Simulator - Telemetry & Vital Monitor",
+        "width": 1280,
+        "height": 860,
+        "minWidth": 1040,
+        "minHeight": 740,
+        "resizable": true
       }
     ],
     "security": {

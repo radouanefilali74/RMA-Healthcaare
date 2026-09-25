@@ -38,7 +38,7 @@ export interface WatchTelemetry {
   alarmState: '00' | '01' | '03' | '05' | '06';
   alarmLabel: string;
   workingMode: number;
-  autoHrInterval: number; // minutes
+  autoHrInterval: number;
   autoHrEnabled: boolean;
   autoTempInterval: number;
   autoTempEnabled: boolean;
@@ -54,10 +54,22 @@ export interface WatchTelemetry {
   powerState: 'ON' | 'REBOOTING' | 'OFF';
 }
 
+export type AlarmType = 
+  | 'SOS' 
+  | 'FALL' 
+  | 'NOT_WORN' 
+  | 'TACHYCARDIA' 
+  | 'BRADYCARDIA' 
+  | 'HYPOXEMIA' 
+  | 'HYPERTENSION' 
+  | 'HYPOTENSION' 
+  | 'FEVER' 
+  | 'HYPOTHERMIA';
+
 export interface AlarmEvent {
   id: string;
   timestamp: string;
-  type: 'SOS' | 'FALL' | 'NOT_WORN';
+  type: AlarmType;
   imei: string;
   latitude: number;
   longitude: number;
@@ -69,6 +81,7 @@ export interface AlarmEvent {
   temperature: number;
   acknowledged: boolean;
   acknowledgedAt?: string;
+  details?: string;
 }
 
 export interface ServerStats {

@@ -138,11 +138,64 @@ export class TcpProtocolManager extends EventEmitter {
     };
   }
 
+  
+  public evaluateClinicalVitals(): void {
+    const hr = this.telemetry.heartRate;
+    const spo2 = this.telemetry.spo2;
+    const sbp = this.telemetry.sbp;
+    const dbp = this.telemetry.dbp;
+    const temp = this.telemetry.temperature;
+
+    if (hr >= 120) {
+      const recent = this.activeAlarms.find(a => !a.acknowledged && a.type === 'TACHYCARDIA' && Date.now() - new Date(a.timestamp).getTime() < 20000);
+      if (!recent) {
+        this.telemetry.alarmState = '01';
+        this.telemetry.alarmLabel = 'CRITICAL TACHYCARDIA (' + hr + ' BPM)';
+        this.recordAlarm('TACHYCARDIA', this.telemetry.latitude, this.telemetry.longitude, 'Severe tachycardia: ' + hr + ' bpm (Normal: 60-100)');
+      }
+    } else if (hr > 0 && hr <= 45) {
+      const recent = this.activeAlarms.find(a => !a.acknowledged && a.type === 'BRADYCARDIA' && Date.now() - new Date(a.timestamp).getTime() < 20000);
+      if (!recent) {
+        this.telemetry.alarmState = '01';
+        this.telemetry.alarmLabel = 'CRITICAL BRADYCARDIA (' + hr + ' BPM)';
+        this.recordAlarm('BRADYCARDIA', this.telemetry.latitude, this.telemetry.longitude, 'Severe bradycardia: ' + hr + ' bpm');
+      }
+    }
+
+    if (spo2 > 0 && spo2 < 90) {
+      const recent = this.activeAlarms.find(a => !a.acknowledged && a.type === 'HYPOXEMIA' && Date.now() - new Date(a.timestamp).getTime() < 20000);
+      if (!recent) {
+        this.telemetry.alarmState = '01';
+        this.telemetry.alarmLabel = 'CRITICAL HYPOXEMIA (' + spo2 + '%)';
+        this.recordAlarm('HYPOXEMIA', this.telemetry.latitude, this.telemetry.longitude, 'Critical hypoxemia: SpO2 ' + spo2 + '% (Normal: >=95%)');
+      }
+    }
+
+    if (sbp >= 180 || dbp >= 110) {
+      const recent = this.activeAlarms.find(a => !a.acknowledged && a.type === 'HYPERTENSION' && Date.now() - new Date(a.timestamp).getTime() < 20000);
+      if (!recent) {
+        this.telemetry.alarmState = '01';
+        this.telemetry.alarmLabel = 'HYPERTENSIVE CRISIS (' + sbp + '/' + dbp + ')';
+        this.recordAlarm('HYPERTENSION', this.telemetry.latitude, this.telemetry.longitude, 'Hypertensive crisis: ' + sbp + '/' + dbp + ' mmHg');
+      }
+    }
+
+    if (temp >= 38.8) {
+      const recent = this.activeAlarms.find(a => !a.acknowledged && a.type === 'FEVER' && Date.now() - new Date(a.timestamp).getTime() < 20000);
+      if (!recent) {
+        this.telemetry.alarmState = '01';
+        this.telemetry.alarmLabel = 'HIGH FEVER (' + temp.toFixed(1) + '°C)';
+        this.recordAlarm('FEVER', this.telemetry.latitude, this.telemetry.longitude, 'High fever: ' + temp.toFixed(1) + '°C');
+      }
+    }
+  }
+
   public updateTelemetryMetric(updates: Partial<WatchTelemetry>): WatchTelemetry {
     this.telemetry = {
       ...this.telemetry,
       ...updates,
     };
+    this.evaluateClinicalVitals();
     this.emit('telemetry', this.telemetry);
     return this.telemetry;
   }
@@ -335,7 +388,7 @@ export class TcpProtocolManager extends EventEmitter {
     return { reply: replyPayload, parsed };
   }
 
-  private recordAlarm(type: 'SOS' | 'FALL' | 'NOT_WORN', lat: number, lng: number): void {
+  public recordAlarm(type: 'SOS' | 'FALL' | 'NOT_WORN' | 'TACHYCARDIA' | 'BRADYCARDIA' | 'HYPOXEMIA' | 'HYPERTENSION' | 'HYPOTENSION' | 'FEVER' | 'HYPOTHERMIA', lat: number, lng: number, details?: string): void {
     const alarm: AlarmEvent = {
       id: `alarm_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       timestamp: new Date().toISOString(),

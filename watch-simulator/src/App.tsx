@@ -423,7 +423,7 @@ function App() {
   const isSenior2 = selectedPreset === 'senior2';
 
   return (
-    <div className="min-h-screen bg-[#002b36] p-8 flex items-center justify-center gap-12 font-sans text-zinc-100 selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[#002b36] p-6 lg:p-8 flex items-center justify-center gap-8 lg:gap-12 font-sans text-zinc-100 selection:bg-cyan-500/30 overflow-y-auto">
       
       {/* LEFT: THE WATCH UI */}
       <div className="relative shrink-0">
@@ -762,7 +762,7 @@ function App() {
       </div>
 
       {/* RIGHT: DEVICE CONTROLLER */}
-      <div className="w-[620px] h-[610px] bg-[#073642] border border-zinc-800 rounded-3xl p-7 flex flex-col shadow-2xl">
+      <div className="w-[720px] min-h-[760px] h-full max-h-[92vh] bg-[#073642] border border-[#0e4c5b] rounded-3xl p-6 flex flex-col shadow-2xl">
         
         {/* Header */}
         <div className="flex justify-between items-end mb-4 border-b border-zinc-800 pb-4 shrink-0">
@@ -1057,18 +1057,32 @@ function App() {
           </div>
 
           {/* Logs */}
-          <div className="flex justify-between items-end mb-1 shrink-0">
-            <h2 className="text-[11px] font-bold text-zinc-400 tracking-wider">RECENT WATCH PAYLOADS</h2>
-            <span className="text-[9px] text-zinc-600 font-medium">Live Socket Feed</span>
+          <div className="flex justify-between items-end mb-1.5 shrink-0 mt-3">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[11px] font-bold text-zinc-300 tracking-wider">RECENT WATCH PAYLOADS</h2>
+              <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/70 px-1.5 py-0.5 rounded border border-cyan-800/70 font-semibold">{logs.length} logged</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[9px] text-zinc-400 font-medium">Live Socket Feed</span>
+              {logs.length > 0 && (
+                <button
+                  onClick={() => setLogs([])}
+                  className="text-[9px] text-zinc-400 hover:text-red-400 flex items-center gap-1 transition-colors"
+                  title="Clear payload log"
+                >
+                  <Trash2 className="w-3 h-3" /> Clear
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex-1 min-h-0 bg-[#00212b] border border-[#0e4c5b] rounded-xl p-3 overflow-y-auto font-mono text-xs">
+          <div className="flex-1 min-h-[160px] bg-[#00212b] border border-[#0e4c5b] rounded-xl p-3 overflow-y-auto font-mono text-xs shadow-inner">
              {logs.length === 0 ? (
-               <p className="text-zinc-700 italic text-[11px]">No payloads transmitted yet.</p>
+               <p className="text-zinc-600 italic text-[11px]">No payloads transmitted yet.</p>
              ) : (
                logs.map((log, i) => (
-                <div key={i} className="mb-1 flex gap-2 text-[11px]">
-                  <span className={`shrink-0 font-bold ${log.dir === 'TX' ? 'text-blue-500' : 'text-emerald-500'}`}>[{log.dir}]</span>
-                  <span className="text-zinc-300 break-all">{log.data}</span>
+                <div key={i} className="mb-1.5 flex gap-2 text-[11px] leading-relaxed">
+                  <span className={`shrink-0 font-bold font-mono ${log.dir === 'TX' ? 'text-cyan-400' : 'text-emerald-400'}`}>[{log.dir}]</span>
+                  <span className="text-zinc-200 break-all">{log.data}</span>
                 </div>
               ))
              )}

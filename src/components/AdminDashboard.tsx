@@ -294,23 +294,71 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {/* Heart Rate */}
-            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+            <div className={`bg-white dark:bg-zinc-900 p-4 rounded-2xl border shadow-sm relative overflow-hidden transition-all ${
+              telemetry.heartRate >= 120
+                ? 'border-rose-500 ring-2 ring-rose-500/50 bg-rose-500/5 animate-pulse'
+                : telemetry.heartRate <= 45 && telemetry.heartRate > 0
+                  ? 'border-blue-500 ring-2 ring-blue-500/50 bg-blue-500/5'
+                  : telemetry.heartRate > 100
+                    ? 'border-amber-500/60'
+                    : 'border-zinc-200 dark:border-zinc-800'
+            }`}>
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Heart Rate</span>
-                <Heart className="w-4 h-4 text-rose-500 animate-pulse" />
+                <Heart className={`w-4 h-4 ${
+                  telemetry.heartRate >= 120
+                    ? 'text-rose-600 animate-bounce'
+                    : 'text-rose-500 animate-pulse'
+                }`} />
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-rose-500 font-mono">{telemetry.heartRate}</span>
+                <span className={`text-3xl font-black font-mono ${
+                  telemetry.heartRate >= 120
+                    ? 'text-rose-600 dark:text-rose-400'
+                    : telemetry.heartRate <= 45 && telemetry.heartRate > 0
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : telemetry.heartRate > 100
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-emerald-600 dark:text-emerald-400'
+                }`}>
+                  {telemetry.heartRate}
+                </span>
                 <span className="text-xs text-zinc-400">bpm</span>
               </div>
               <div className="mt-2 text-[11px] text-zinc-400 flex items-center justify-between">
                 <span>Source: APHP/AP49</span>
-                <span className="text-emerald-500 font-medium">Normal</span>
+                <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] uppercase ${
+                  telemetry.heartRate >= 140
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 animate-pulse ring-1 ring-rose-500'
+                    : telemetry.heartRate >= 120
+                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                      : telemetry.heartRate > 100
+                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                        : telemetry.heartRate <= 45 && telemetry.heartRate > 0
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                          : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                }`}>
+                  {telemetry.heartRate >= 140
+                    ? '⚡ Severe Tachycardia'
+                    : telemetry.heartRate >= 120
+                      ? '⚠️ Tachycardia'
+                      : telemetry.heartRate > 100
+                        ? 'Elevated'
+                        : telemetry.heartRate <= 45 && telemetry.heartRate > 0
+                          ? '⚠️ Bradycardia'
+                          : 'Normal'}
+                </span>
               </div>
             </div>
 
             {/* Blood Pressure */}
-            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <div className={`bg-white dark:bg-zinc-900 p-4 rounded-2xl border shadow-sm transition-all ${
+              telemetry.sbp >= 180 || telemetry.dbp >= 110
+                ? 'border-rose-500 ring-2 ring-rose-500/50 bg-rose-500/5'
+                : telemetry.sbp >= 140 || telemetry.dbp >= 90
+                  ? 'border-amber-500/60'
+                  : 'border-zinc-200 dark:border-zinc-800'
+            }`}>
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Blood Pressure</span>
                 <Activity className="w-4 h-4 text-amber-500" />
@@ -323,41 +371,115 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="mt-2 text-[11px] text-zinc-400 flex items-center justify-between">
                 <span>SBP/DBP</span>
-                <span className="text-amber-500 font-medium">Optimal</span>
+                <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] uppercase ${
+                  telemetry.sbp >= 180 || telemetry.dbp >= 110
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 animate-pulse'
+                    : telemetry.sbp >= 140 || telemetry.dbp >= 90
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      : telemetry.sbp < 90 || telemetry.dbp < 60
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                }`}>
+                  {telemetry.sbp >= 180 || telemetry.dbp >= 110
+                    ? '⚠️ Crisis (≥180/110)'
+                    : telemetry.sbp >= 140 || telemetry.dbp >= 90
+                      ? 'Stage 2 High'
+                      : telemetry.sbp >= 130 || telemetry.dbp >= 80
+                        ? 'Pre-High'
+                        : telemetry.sbp < 90 || telemetry.dbp < 60
+                          ? 'Hypotension'
+                          : 'Optimal'}
+                </span>
               </div>
             </div>
 
             {/* SpO2 */}
-            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <div className={`bg-white dark:bg-zinc-900 p-4 rounded-2xl border shadow-sm transition-all ${
+              telemetry.spo2 < 90 && telemetry.spo2 > 0
+                ? 'border-rose-500 ring-2 ring-rose-500/50 bg-rose-500/5 animate-pulse'
+                : telemetry.spo2 < 95 && telemetry.spo2 > 0
+                  ? 'border-amber-500/60'
+                  : 'border-zinc-200 dark:border-zinc-800'
+            }`}>
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Blood Oxygen</span>
                 <Activity className="w-4 h-4 text-cyan-500" />
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-cyan-500 font-mono">{telemetry.spo2}</span>
+                <span className={`text-3xl font-black font-mono ${
+                  telemetry.spo2 < 90
+                    ? 'text-rose-500'
+                    : telemetry.spo2 < 95
+                      ? 'text-amber-500'
+                      : 'text-cyan-500'
+                }`}>
+                  {telemetry.spo2}
+                </span>
                 <span className="text-xs text-zinc-400">%</span>
               </div>
               <div className="mt-2 text-[11px] text-zinc-400 flex items-center justify-between">
                 <span>SpO2 Level</span>
-                <span className="text-emerald-500 font-medium">Healthy</span>
+                <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] uppercase ${
+                  telemetry.spo2 < 90
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 animate-pulse'
+                    : telemetry.spo2 < 95
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                }`}>
+                  {telemetry.spo2 < 90
+                    ? '⚠️ Critical Hypoxia'
+                    : telemetry.spo2 < 95
+                      ? 'Low (<95%)'
+                      : 'Healthy'}
+                </span>
               </div>
             </div>
 
             {/* Temperature */}
-            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <div className={`bg-white dark:bg-zinc-900 p-4 rounded-2xl border shadow-sm transition-all ${
+              telemetry.temperature >= 38.8 || (telemetry.temperature <= 35.0 && telemetry.temperature > 0)
+                ? 'border-rose-500 ring-2 ring-rose-500/50 bg-rose-500/5'
+                : telemetry.temperature >= 37.5
+                  ? 'border-amber-500/60'
+                  : 'border-zinc-200 dark:border-zinc-800'
+            }`}>
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Body Temp</span>
-                <Thermometer className="w-4 h-4 text-emerald-500" />
+                <Thermometer className={`w-4 h-4 ${
+                  telemetry.temperature >= 38.8 ? 'text-rose-500' : 'text-emerald-500'
+                }`} />
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-emerald-500 font-mono">
+                <span className={`text-3xl font-black font-mono ${
+                  telemetry.temperature >= 38.8
+                    ? 'text-rose-500'
+                    : telemetry.temperature >= 37.5
+                      ? 'text-amber-500'
+                      : 'text-emerald-500'
+                }`}>
                   {telemetry.temperature.toFixed(1)}
                 </span>
                 <span className="text-xs text-zinc-400">°C</span>
               </div>
               <div className="mt-2 text-[11px] text-zinc-400 flex items-center justify-between">
                 <span>Source: AP50/APHP</span>
-                <span className="text-emerald-500 font-medium">Normal</span>
+                <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] uppercase ${
+                  telemetry.temperature >= 38.8
+                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                    : telemetry.temperature >= 37.5
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      : telemetry.temperature <= 35.0 && telemetry.temperature > 0
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                }`}>
+                  {telemetry.temperature >= 38.8
+                    ? '⚠️ High Fever'
+                    : telemetry.temperature >= 37.5
+                      ? 'Elevated'
+                      : telemetry.temperature <= 35.0 && telemetry.temperature > 0
+                        ? 'Hypothermia'
+                        : 'Normal'}
+                </span>
               </div>
             </div>
 
